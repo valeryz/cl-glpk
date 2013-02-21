@@ -39,7 +39,7 @@
   :depends-on (cffi trivial-garbage iterate)
   :serial t
   :components ((:file "packages")
-               ;; (cffi-grovel:grovel-file "grovel")
+               (cffi-grovel:grovel-file "grovel")
                (:file "glpk-ffi")
 	       (:file "lisp-api")
                (:file "high-level")))
