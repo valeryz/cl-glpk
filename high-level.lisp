@@ -110,7 +110,6 @@
                      for row from 0
                      appending (loop for product in (standardize-equation (car constraint))
                                   for col from 0
-                                    do (format t "~a" product)
                                   collecting (list (1+ row)
                                                    (progn
                                                      (format t "~a - ~a - ~a~%"
