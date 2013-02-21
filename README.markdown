@@ -16,9 +16,9 @@ Load the ASDF system. The low-level FFI bindings are implicitly documented by
 the GLPK manual. For the (partial) high-level API, see `examples/sample.lisp`. The highest-level API allows you to express linear programs like:
 
     (make-linear-program
-     :maximize (+ (* (- 12 2) x1) (* 6 x2) (* 4 x3))
+     :maximize (+ (* 10 x1) (* 6 x2) (* 4 x3))
      :subject-to ((<= (+ x1 x2 x3) 100)
-                  (<= (+ (* (+ 2 2) x2) (* 10 x1) (* 5 x3)) (+ 200 400))
+                  (<= (+ (* 4 x2) (* 10 x1) (* 5 x3)) 600)
                   (<= (+ (* 2 x1) (* 2 x2) (* 6 x3)) 300))
      :bounds ((>= x3 10)))
 
@@ -39,6 +39,9 @@ Then you can solve the program and get results with
 There are still a lot of improvements to build into this high-level API before
 it's really complete.
 
+Instead of the macro you can also use the underlying functional interface
+`compute-linear-program`.
+
 ## License
 
 BSD sans advertising clause (see file COPYING)
@@ -46,6 +49,8 @@ BSD sans advertising clause (see file COPYING)
 ## TODO List
 
 ### Write more examples
+
+### Write some tests
 
 ### Improve error handling
 

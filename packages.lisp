@@ -39,4 +39,5 @@
 	   #:simplex
 	   #:objective-value
 	   #:column-primal-value
-           #:make-linear-program))
+           #:make-linear-program
+           #:compute-linear-program))
