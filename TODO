@@ -1,0 +1,5 @@
+* fix memory leaks (foreign-alloc)
+* write at least some tests
+
+* full ffi grovel instead of hardcoding
+
