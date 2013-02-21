@@ -24,6 +24,10 @@
 ;;; NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ;;; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (mapc #+quicklisp #'ql:quickload #-quicklisp #'asdf:load-system
+        '(cffi-grovel)))
+
 (asdf:defsystem :cl-glpk
   :author "Kai Kaminski <kai.kaminski@gmx.de>"
   :maintainer "Greg Pfeil <greg@technomadic.org>"
@@ -32,9 +36,10 @@
   :description "FFI Bindings for GLPK"
   :long-description "FFI Bindings for the GNU Linear Programming Kit"
   :version "0.1"
+  :depends-on (cffi trivial-garbage iterate)
   :serial t
-  :depends-on (:cffi :trivial-garbage :iterate)
   :components ((:file "packages")
+               ;; (cffi-grovel:grovel-file "grovel")
                (:file "glpk-ffi")
 	       (:file "lisp-api")
                (:file "high-level")))
