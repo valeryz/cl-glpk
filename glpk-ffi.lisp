@@ -442,6 +442,10 @@ void lpx_get_col_bnds(LPX *lp, int j, int *typx, double *lb,
     solver-exit-code
   (problem :pointer))
 
+(defcfun ("_glp_lpx_simplex" %simplex)
+    solver-exit-code
+  (problem :pointer))
+
 (defcfun ("_glp_lpx_exact" %exact)
     solver-exit-code
   (problem :pointer))
@@ -885,3 +889,30 @@ typedef struct
          '?' - primal and dual solutions are not complementary */
 } LPXKKT;
 |#
+
+(defcfun ("glp_init_smcp" %glp-init-smcp)
+    :void
+  (parameters :pointer))
+
+(defcfun ("glp_simplex" %glp-simplex)
+    ;XXX enum solver-exit-code
+    :int
+  (problem :pointer)
+  (parameters :pointer))
+
+(defun glp_simplex (linear-problem &key (output-level :default))
+  (check-type linear-problem linear-problem)
+  (let ((lp (_problem linear-problem)))
+    (with-foreign-object (parameters 'glp-smcp)
+      (%glp-init-smcp parameters)
+      (setf (foreign-slot-value parameters 'glp-smcp 'msg_lev)
+            (ecase output-level
+              (:none glp_msg_off)
+              (:error glp_msg_err)
+              (:default glp_msg_on)
+              (:all glp_msg_all)
+              (:debug glp_msg_dbg)))
+      (let ((ret (%glp-simplex lp parameters)))
+        ;; FIXME differentiate between errors
+        (values (zerop ret) ret)))))
+
