@@ -58,8 +58,16 @@ Currently error handling is done by either `(ERROR ...)` or `(ASSERT ...)`.
 
 ### Extend High Level API
 
-#### Make up a DSL (similar to GLPK's MPS files, but lispier)
+### Make up a DSL (similar to GLPK's MPS files, but lispier)
 
-This is partially completed in `MAKE-LINEAR-PROGRAM`.
+This is partially completed in `make-linear-program`/`compute-linear-problem`.
 
 ### Complete FFI bindings
+
+## Memory management
+
+Linear problem FFI objects are properly freed by way of attaching a
+finalizer to their CLOS counterpart. Replacing the constraints of
+a linear problem CLOS object will free the memory used by replaced
+constraints (`glp_load_matrix` will do this on the C side).
+

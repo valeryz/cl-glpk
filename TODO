@@ -1,5 +1,5 @@
-* fix memory leaks (foreign-alloc)
 * write at least some tests
 
+* port to new GLP API (replace LPX stuff in the FFI)
 * full ffi grovel instead of hardcoding
 

@@ -37,8 +37,9 @@
 	    (direction lp))))
 
 (defmethod initialize-instance :after
-    ((lp linear-problem) &key name direction rows columns constraints objective &allow-other-keys)
-  (let ((_problem  (%create-prob)))    
+  ((lp linear-problem) &key name direction rows columns
+                       constraints objective &allow-other-keys)
+  (let ((_problem  (%create-prob)))
     (setf (slot-value lp '_problem) _problem)
     
     (when direction
