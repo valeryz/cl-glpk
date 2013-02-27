@@ -150,7 +150,7 @@
 ;;; Solvers
 
 (defmethod simplex ((lp linear-problem))
-  (glp_simplex (_problem lp)))
+  (glp_simplex lp))
 
 
 ;;; Query functions
