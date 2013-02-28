@@ -895,8 +895,7 @@ typedef struct
   (parameters :pointer))
 
 (defcfun ("glp_simplex" %glp-simplex)
-    ;XXX enum solver-exit-code
-    :int
+    glp-return-values
   (problem :pointer)
   (parameters :pointer))
 
@@ -913,6 +912,5 @@ typedef struct
               (:all glp_msg_all)
               (:debug glp_msg_dbg)))
       (let ((ret (%glp-simplex lp parameters)))
-        ;; FIXME differentiate between errors
-        (values (zerop ret) ret)))))
+        (values (eq ret :ok) ret)))))
 

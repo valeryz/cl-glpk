@@ -149,8 +149,8 @@
 
 ;;; Solvers
 
-(defmethod simplex ((lp linear-problem))
-  (glp_simplex lp))
+(defmethod simplex ((lp linear-problem) &key (output-level :default))
+  (glp_simplex lp :output-level output-level))
 
 
 ;;; Query functions

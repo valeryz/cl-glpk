@@ -2,14 +2,34 @@
 
 (include "glpk.h")
 
+;;; control parameter struct
 (cstruct glp-smcp "glp_smcp"
   (msg_lev "msg_lev" :type :int))
 
+;;; simplex solver output control
 (constant (glp_msg_off "GLP_MSG_OFF"))
 (constant (glp_msg_err "GLP_MSG_ERR"))
 (constant (glp_msg_on "GLP_MSG_ON")) ; normal
 (constant (glp_msg_all "GLP_MSG_ALL"))
 (constant (glp_msg_dbg "GLP_MSG_DBG"))
+
+;;; return codes
+(define "CL_GLPK_ZERO" 0)
+
+(constantenum glp-return-values
+  ((:ok "CL_GLPK_ZERO"))
+  ((:invalid-basis "GLP_EBADB"))
+  ((:singular-matrix "GLP_ESING"))
+  ((:ill-conditioned-matrix "GLP_ECOND"))
+  ((:invalid-bounds "GLP_EBOUND"))
+  ((:solver-failed "GLP_EFAIL"))
+  ((:objective-lower-limit-reached "GLP_EOBJLL"))
+  ((:objective-upper-limit-reached "GLP_EOBJUL"))
+  ((:iteration-limit-exceeded "GLP_EITLIM"))
+  ((:time-limit-exceeded "GLP_ETMLIM"))
+  ((:no-primal-feasible-solution "GLP_ENOPFS"))
+  ((:no-dual-feasible-solution "GLP_ENODFS")))
+
 
 #|
 typedef struct

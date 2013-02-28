@@ -112,6 +112,7 @@
                                   for col from 0
                                   collecting (list (1+ row)
                                                    (progn
+                                                     #+(or)
                                                      (format t "~a - ~a - ~a~%"
                                                              (second product)
                                                              (position (second product) variables)
