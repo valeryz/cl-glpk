@@ -33,24 +33,24 @@
 (defmethod print-object ((lp linear-problem) stream)
   (print-unreadable-object (lp stream :type t)
     (format stream "~a / ~a"
-	    (name lp)
-	    (direction lp))))
+            (name lp)
+            (direction lp))))
 
 (defmethod initialize-instance :after
   ((lp linear-problem) &key name direction rows columns
                        constraints objective &allow-other-keys)
   (let ((_problem  (%create-prob)))
     (setf (slot-value lp '_problem) _problem)
-    
+
     (when direction
       (setf (direction lp) direction))
-    
+
     (when name
       (setf (name lp) name))
-    
+
     (when columns
       (setf (columns lp) columns))
-    
+
     (when rows
       (setf (rows lp) rows))
 
@@ -59,9 +59,10 @@
 
     (when objective
       (setf (objective lp) objective))
-    
+
     (finalize lp (lambda ()
-		   (%delete-prob _problem)))))
+                (%delete-prob _problem)))
+    ))
 
 ;;; Accessors
 (defmethod name ((lp linear-problem))
@@ -84,38 +85,38 @@
 ;all the specified columns. Otherwise it asserts that
 ;(= (LENGTH COLUMNS) (NUMBER-OF-COLUMNS LP)) and sets names and bounds of the columns."
   (let* ((_lp (_problem lp))
-	 (num-cols (%get-num-cols _lp))
-	 (new-num-cols (length columns)))
+         (num-cols (%get-num-cols _lp))
+         (new-num-cols (length columns)))
     (if (= 0 num-cols)
-	(%add-cols _lp new-num-cols)
-	(assert (= num-cols new-num-cols)))
-    
+        (%add-cols _lp new-num-cols)
+        (assert (= num-cols new-num-cols)))
+
     (iter (for column in columns)
-	  (for k from 1)
-	  (destructuring-bind (name type lower-bound upper-bound)
-	      column
-	    (%set-col-name _lp k name)
-	    (%set-col-bnds _lp k type
-			   (coerce lower-bound 'double-float)
-			   (coerce upper-bound 'double-float))))
+          (for k from 1)
+          (destructuring-bind (name type lower-bound upper-bound)
+              column
+            (%set-col-name _lp k name)
+            (%set-col-bnds _lp k type
+                           (coerce lower-bound 'double-float)
+                           (coerce upper-bound 'double-float))))
     columns))
 
 (defmethod (setf rows) (rows (lp linear-problem))
   (let* ((_lp (_problem lp))
-	 (num-rows (%get-num-rows _lp))
-	 (new-num-rows (length rows)))
+         (num-rows (%get-num-rows _lp))
+         (new-num-rows (length rows)))
     (if (= 0 num-rows)
-	(%add-rows _lp new-num-rows)
-	(assert (= num-rows new-num-rows)))
+        (%add-rows _lp new-num-rows)
+        (assert (= num-rows new-num-rows)))
 
     (iter (for row in rows)
-	  (for k from 1)
-	  (destructuring-bind (name type lower-bound upper-bound)
-	      row
-	    (%set-row-name _lp k name)
-	    (%set-row-bnds _lp k type
-			   (coerce lower-bound 'double-float)
-			   (coerce upper-bound 'double-float))))
+          (for k from 1)
+          (destructuring-bind (name type lower-bound upper-bound)
+              row
+            (%set-row-name _lp k name)
+            (%set-row-bnds _lp k type
+                           (coerce lower-bound 'double-float)
+                           (coerce upper-bound 'double-float))))
     rows))
 
 (defmethod number-of-rows ((lp linear-problem))
@@ -126,31 +127,40 @@
 
 (defmethod (setf constraints) (constraints (lp linear-problem))
   (let ((is (foreign-alloc :int :count (1+ (length constraints))))
-	(js (foreign-alloc :int :count (1+ (length constraints))))
-	(coefs (foreign-alloc :double :count (1+ (length constraints)))))
+        (js (foreign-alloc :int :count (1+ (length constraints))))
+        (coefs (foreign-alloc :double :count (1+ (length constraints)))))
     (iter (for (i j coef) in constraints)
-	  (for k from 1)
-	  (assert (<= i (number-of-rows lp)))
-	  (assert (<= j (number-of-columns lp)))
-	  (assert (/= coef 0d0))
-	  (setf (mem-aref is :int k) i)
-	  (setf (mem-aref js :int k) j)
-	  (setf (mem-aref coefs :double k) (coerce coef 'double-float)))
+          (for k from 1)
+          (assert (<= i (number-of-rows lp)))
+          (assert (<= j (number-of-columns lp)))
+          (assert (/= coef 0d0))
+          (setf (mem-aref is :int k) i)
+          (setf (mem-aref js :int k) j)
+          (setf (mem-aref coefs :double k) (coerce coef 'double-float)))
     (%load-matrix (_problem lp) (length constraints) is js coefs)
     constraints))
 
 (defmethod (setf objective) (objective (lp linear-problem))
   (assert (<= (length objective) (number-of-columns lp)))
   (iter (for coef in objective)
-	(for k from 1)
-	(%set-obj-coef (_problem lp) k (coerce coef 'double-float)))
+        (for k from 1)
+        (%set-obj-coef (_problem lp) k (coerce coef 'double-float)))
   objective)
 
 
 ;;; Solvers
 
 (defmethod simplex ((lp linear-problem) &key (output-level :default))
-  (glp_simplex lp :output-level output-level))
+  ;; lpx_set_int_parm(lp, LPX_K_MSGLEV, 1)
+  (%set-int-parm (_problem lp) lpx_k_msglev
+                 (ecase output-level
+                   (:none glp_msg_off)
+                   (:error glp_msg_err)
+                   (:default glp_msg_on)
+                   (:all glp_msg_all)
+                   (:debug glp_msg_dbg)))
+  (let ((ret (%simplex (_problem lp))))
+    (values (eq ret :ok) ret)))
 
 
 ;;; Query functions
@@ -171,12 +181,12 @@ Example: '((1 9) (7 4)) => ((1 1 1) (1 2 9) (2 1 7) (2 2 4))"
   (typecase constraints
     (cons
      (array/list->constraints (make-array (list (length constraints)
-						(length (car constraints)))
-					  :initial-contents constraints)))
+                                                (length (car constraints)))
+                                          :initial-contents constraints)))
 
     (array
      (iter (for i from 0 below (array-dimension constraints 0))
-	   (appending (iter (for j from 0 below (array-dimension constraints 1))
-			    (for value = (coerce (aref constraints i j) 'double-float))
-			    (when (/= 0.0d0 value)
-			      (collect (list (1+ i) (1+ j) value)))))))))
+           (appending (iter (for j from 0 below (array-dimension constraints 1))
+                            (for value = (coerce (aref constraints i j) 'double-float))
+                            (when (/= 0.0d0 value)
+                              (collect (list (1+ i) (1+ j) value)))))))))

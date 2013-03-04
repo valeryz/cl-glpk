@@ -13,6 +13,8 @@
 (constant (glp_msg_all "GLP_MSG_ALL"))
 (constant (glp_msg_dbg "GLP_MSG_DBG"))
 
+(constant (lpx_k_msglev "LPX_K_MSGLEV"))
+
 ;;; return codes
 (define "CL_GLPK_ZERO" 0)
 
