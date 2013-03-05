@@ -28,16 +28,18 @@
   (:nicknames #:glpk)
   (:use #:cl #:cffi #:trivial-garbage #:iterate)
   (:export #:linear-problem
-	   #:rows
-	   #:number-of-rows
-	   #:columns
-	   #:number-of-columns
-	   #:constraints
-	   #:direction
-	   #:name
-	   #:objective
-	   #:simplex
-	   #:objective-value
-	   #:column-primal-value
+           #:rows
+           #:number-of-rows
+           #:columns
+           #:number-of-columns
+           #:constraints
+           #:direction
+           #:name
+           #:objective
+           #:simplex
+           #:objective-value
+           #:column-primal-value
            #:make-linear-program
-           #:compute-linear-program))
+           #:compute-linear-program
+           #:with-linear-program
+           #:destroy-linear-program))

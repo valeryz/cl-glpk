@@ -59,9 +59,6 @@
 
     (when objective
       (setf (objective lp) objective))
-
-    (finalize lp (lambda ()
-                (%delete-prob _problem)))
     ))
 
 ;;; Accessors
@@ -147,6 +144,18 @@
         (%set-obj-coef (_problem lp) k (coerce coef 'double-float)))
   objective)
 
+
+(defmethod destroy-linear-program ((lp linear-problem))
+  (let ((problem (_problem lp)))
+    (setf (slot-value lp '_problem) nil)
+    (when problem
+      (%delete-prob problem))))
+
+(defmacro with-linear-program ((var expr) &body body)
+  `(let ((,var (compute-linear-program ,@expr)))
+     (unwind-protect
+          ,@(progn body)
+       (destroy-linear-program ,var))))
 
 ;;; Solvers
 
