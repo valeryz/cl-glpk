@@ -42,9 +42,9 @@
 ;; type of auxiliary/structural variable
 (defcenum variable-type
   (:free 110)           ;; /* free variable */
-  (:lower-bound 111)    ;; /* variable with lower bound */	
-  (:upper-bound 112)	;; /* variable with upper bound */	
-  (:double-bound 113)	;; /* double-bounded variable */	
+  (:lower-bound 111)    ;; /* variable with lower bound */
+  (:upper-bound 112)	;; /* variable with upper bound */
+  (:double-bound 113)	;; /* double-bounded variable */
   (:fixed 114))		;; /* fixed variable */
 
 (defcenum basis-status
@@ -133,13 +133,13 @@
   (:tolint 318) ;; /* lp->tol_int */
   (:tolobj 319) ;; /* lp->tol_obj */
   (:mpsinfo 320) ;; /* lp->mps_info */
-  (:mpsobj 321)	 ;; /* lp->mps_obj */
+  (:mpsobj 321)  ;; /* lp->mps_obj */
   (:mpsorig 322) ;; /* lp->mps_orig */
   (:mpswide 323) ;; /* lp->mps_wide */
   (:mpsfree 324) ;; /* lp->mps_free */
   (:mpsskip 325) ;; /* lp->mps_skip */
   (:lptorig 326) ;; /* lp->lpt_orig */
-  (:presol 327)	 ;; /* lp->presol */
+  (:presol 327)  ;; /* lp->presol */
   (:binarize 328) ;; /* lp->binarize */
   (:usecuts 329)) ;; /* lp->use_cuts */
 
@@ -437,10 +437,6 @@ void lpx_get_col_bnds(LPX *lp, int j, int *typx, double *lb,
   (problem :pointer)
   (index :int)
   (status variable-status))
-
-(defcfun ("_glp_lpx_simplex" %simplex)
-    solver-exit-code
-  (problem :pointer))
 
 (defcfun ("_glp_lpx_simplex" %simplex)
     solver-exit-code
@@ -902,9 +898,9 @@ typedef struct
 (defun glp_simplex (linear-problem &key (output-level :default))
   (check-type linear-problem linear-problem)
   (let ((lp (_problem linear-problem)))
-    (with-foreign-object (parameters 'glp-smcp)
+    (with-foreign-object (parameters '(:struct glp-smcp))
       (%glp-init-smcp parameters)
-      (setf (foreign-slot-value parameters 'glp-smcp 'msg_lev)
+      (setf (foreign-slot-value parameters '(:struct glp-smcp) 'msg_lev)
             (ecase output-level
               (:none glp_msg_off)
               (:error glp_msg_err)
@@ -913,4 +909,3 @@ typedef struct
               (:debug glp_msg_dbg)))
       (let ((ret (%glp-simplex lp parameters)))
         (values (eq ret :ok) ret)))))
-

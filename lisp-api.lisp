@@ -62,19 +62,31 @@
     ))
 
 ;;; Accessors
+(defgeneric name (lp)
+  (:documentation "Name of linear problem"))
+
 (defmethod name ((lp linear-problem))
   (%get-prob-name (_problem lp)))
+
+(defgeneric (setf name) (name lp)
+  (:documentation "Set name of linear problem"))
 
 (defmethod (setf name) (name (lp linear-problem))
   (%set-prob-name (_problem lp) name)
   name)
 
+(defgeneric direction (lp))
+
 (defmethod direction ((lp linear-problem))
   (%get-obj-dir (_problem lp)))
+
+(defgeneric (setf direction) (direction lp))
 
 (defmethod (setf direction) (direction (lp linear-problem))
   (%set-obj-dir (_problem lp) direction)
   direction)
+
+(defgeneric (setf columns) (columns lp))
 
 (defmethod (setf columns) (columns (lp linear-problem))
 ; This docstring is commented out, because Emacs/Slime chokes on it otherwise.
@@ -98,6 +110,8 @@
                            (coerce upper-bound 'double-float))))
     columns))
 
+(defgeneric (setf rows) (rows lp))
+
 (defmethod (setf rows) (rows (lp linear-problem))
   (let* ((_lp (_problem lp))
          (num-rows (%get-num-rows _lp))
@@ -116,11 +130,17 @@
                            (coerce upper-bound 'double-float))))
     rows))
 
+(defgeneric number-of-rows (lp))
+
 (defmethod number-of-rows ((lp linear-problem))
   (%get-num-rows (_problem lp)))
 
+(defgeneric number-of-columns (lp))
+
 (defmethod number-of-columns ((lp linear-problem))
   (%get-num-cols (_problem lp)))
+
+(defgeneric (setf constraints) (constraints lp))
 
 (defmethod (setf constraints) (constraints (lp linear-problem))
   (let ((is (foreign-alloc :int :count (1+ (length constraints))))
@@ -137,6 +157,8 @@
     (%load-matrix (_problem lp) (length constraints) is js coefs)
     constraints))
 
+(defgeneric (setf objective) (objective lp))
+
 (defmethod (setf objective) (objective (lp linear-problem))
   (assert (<= (length objective) (number-of-columns lp)))
   (iter (for coef in objective)
@@ -144,6 +166,7 @@
         (%set-obj-coef (_problem lp) k (coerce coef 'double-float)))
   objective)
 
+(defgeneric destroy-linear-program (lp))
 
 (defmethod destroy-linear-program ((lp linear-problem))
   (let ((problem (_problem lp)))
@@ -158,6 +181,9 @@
        (destroy-linear-program ,var))))
 
 ;;; Solvers
+
+(defgeneric simplex (lp &key output-level)
+  (:documentation "Run simplex algorithm"))
 
 (defmethod simplex ((lp linear-problem) &key (output-level :default))
   ;; lpx_set_int_parm(lp, LPX_K_MSGLEV, 1)
@@ -174,8 +200,12 @@
 
 ;;; Query functions
 
+(defgeneric objective-value (lp))
+
 (defmethod objective-value ((lp linear-problem))
   (%get-obj-val (_problem lp)))
+
+(defgeneric column-primal-value (lp column))
 
 (defmethod column-primal-value ((lp linear-problem) column)
   (%get-col-prim (_problem lp) column))
