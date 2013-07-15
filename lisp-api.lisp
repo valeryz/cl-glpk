@@ -143,9 +143,9 @@
 (defgeneric (setf constraints) (constraints lp))
 
 (defmethod (setf constraints) (constraints (lp linear-problem))
-  (let ((is (foreign-alloc :int :count (1+ (length constraints))))
-        (js (foreign-alloc :int :count (1+ (length constraints))))
-        (coefs (foreign-alloc :double :count (1+ (length constraints)))))
+  (with-foreign-objects ((is :int (1+ (length constraints)))
+                         (js :int (1+ (length constraints)))
+                         (coefs :double (1+ (length constraints))))
     (iter (for (i j coef) in constraints)
           (for k from 1)
           (assert (<= i (number-of-rows lp)))
